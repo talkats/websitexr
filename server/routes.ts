@@ -44,4 +44,23 @@ export function registerRoutes(app: Express) {
       res.status(500).json({ error: "Failed to create user" });
     }
   });
+
+  // Delete user
+  app.delete("/api/users/:id", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const deletedUser = await db
+        .delete(users)
+        .where(eq(users.id, userId))
+        .returning();
+
+      if (!deletedUser.length) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      res.json(deletedUser[0]);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete user" });
+    }
+  });
 }

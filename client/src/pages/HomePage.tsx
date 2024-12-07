@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UserForm } from "../components/UserForm";
 import { UserList } from "../components/UserList";
 import { useState } from "react";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 export function HomePage() {
   const [isOpen, setIsOpen] = useState(false);
@@ -22,6 +22,12 @@ export function HomePage() {
               </Button>
             </DialogTrigger>
             <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New User</DialogTitle>
+                <DialogDescription>
+                  Create a new user by filling out the form below.
+                </DialogDescription>
+              </DialogHeader>
               <UserForm onSuccess={() => setIsOpen(false)} />
             </DialogContent>
           </Dialog>

@@ -45,3 +45,64 @@ export async function healthCheck(): Promise<{ status: string }> {
   }
   return response.json();
 }
+
+// Project Management API Functions
+export async function getProjects() {
+  const response = await fetch(`${API_BASE}/projects`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch projects");
+  }
+  return response.json();
+}
+
+export async function createProject(project: { name: string; thumbnail_url?: string }) {
+  const response = await fetch(`${API_BASE}/projects`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(project),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to create project");
+  }
+  return response.json();
+}
+
+export async function updateProject(id: number, project: { name: string; thumbnail_url?: string }) {
+  const response = await fetch(`${API_BASE}/projects/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(project),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to update project");
+  }
+  return response.json();
+}
+
+export async function deleteProject(id: number) {
+  const response = await fetch(`${API_BASE}/projects/${id}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) {
+    throw new Error("Failed to delete project");
+  }
+  return response.json();
+}
+
+export async function assignUsersToProject(projectId: number, userIds: number[]) {
+  const response = await fetch(`${API_BASE}/projects/${projectId}/assign`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ userIds }),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to assign users to project");
+  }
+  return response.json();
+}

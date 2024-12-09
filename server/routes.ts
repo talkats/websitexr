@@ -3,6 +3,7 @@ import { db } from "../db";
 import { users, projects, projectAssignments, User, Project } from "@db/schema";
 import { eq, and } from "drizzle-orm";
 import bcrypt from "bcrypt";
+import cookieParser from "cookie-parser";
 
 // Extend Express Request type to include user
 declare module 'express-serve-static-core' {
@@ -37,6 +38,8 @@ const ensureAuthenticated = (req: Request, res: Response, next: NextFunction) =>
 };
 
 export function registerRoutes(app: Express) {
+  // Set up cookie parser middleware
+  app.use(cookieParser());
   // Health check endpoint
   app.get("/api/health", (_, res) => {
     res.json({ status: "healthy" });

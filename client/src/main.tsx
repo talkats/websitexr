@@ -16,12 +16,22 @@ function PrivateRoute({ component: Component }: { component: React.ComponentType
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   
   useEffect(() => {
-    const checkAuth = () => {
-      const authenticated = document.cookie.includes('authenticated=true');
-      setIsAuthenticated(authenticated);
-      setIsChecking(false);
-      
-      if (!authenticated) {
+    const checkAuth = async () => {
+      try {
+        const authenticated = document.cookie.includes('authenticated=true');
+        console.log('Auth check:', { authenticated, cookies: document.cookie });
+        
+        setIsAuthenticated(authenticated);
+        setIsChecking(false);
+        
+        if (!authenticated) {
+          console.log('Not authenticated, redirecting to login');
+          setLocation('/login');
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+        setIsAuthenticated(false);
+        setIsChecking(false);
         setLocation('/login');
       }
     };
@@ -30,7 +40,7 @@ function PrivateRoute({ component: Component }: { component: React.ComponentType
   }, [setLocation]);
 
   if (isChecking) {
-    return null;
+    return <div>Loading...</div>;
   }
 
   return isAuthenticated ? (
@@ -42,21 +52,30 @@ function PrivateRoute({ component: Component }: { component: React.ComponentType
 }
 
 function Router() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
     const checkAuth = () => {
       const authenticated = document.cookie.includes('authenticated=true');
+      console.log('Router auth check:', { authenticated, location });
+      
       setIsAuthenticated(authenticated);
+      setIsChecking(false);
       
       if (authenticated && location === '/login') {
-        window.location.href = '/';
+        console.log('Authenticated user at login page, redirecting to home');
+        setLocation('/');
       }
     };
     
     checkAuth();
-  }, [location]);
+  }, [location, setLocation]);
+
+  if (isChecking) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Switch>

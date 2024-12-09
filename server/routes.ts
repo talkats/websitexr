@@ -72,9 +72,10 @@ export function registerRoutes(app: Express) {
 
       // Set authentication cookie
       res.cookie('authenticated', 'true', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+        httpOnly: false, // Allow JavaScript access
+        secure: false, // Allow non-HTTPS in development
+        sameSite: 'strict',
+        path: '/',
         maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
       });
 

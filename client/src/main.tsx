@@ -18,8 +18,15 @@ function PrivateRoute({ component: Component }: { component: React.ComponentType
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const authenticated = document.cookie.includes('authenticated=true');
-        console.log('Auth check:', { authenticated, cookies: document.cookie });
+        // Parse cookies into an object
+        const cookies = document.cookie.split(';').reduce((acc, cookie) => {
+          const [key, value] = cookie.trim().split('=');
+          acc[key] = value;
+          return acc;
+        }, {} as Record<string, string>);
+        
+        const authenticated = cookies['authenticated'] === 'true';
+        console.log('Auth check:', { authenticated, cookies });
         
         setIsAuthenticated(authenticated);
         setIsChecking(false);

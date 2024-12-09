@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { HomePage } from "./pages/HomePage";
 import { ProjectManagementPage } from "./pages/ProjectManagementPage";
 import { LoginPage } from "./pages/LoginPage";
+import { Layout } from "./components/Layout";
 
 function PrivateRoute({ component: Component }: { component: React.ComponentType }) {
   const [, setLocation] = useLocation();
@@ -36,7 +37,7 @@ function PrivateRoute({ component: Component }: { component: React.ComponentType
 }
 
 function Router() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
@@ -44,9 +45,13 @@ function Router() {
       const authenticated = document.cookie.includes('authenticated=true');
       setIsAuthenticated(authenticated);
       
+      // Redirect to login if not authenticated and not already on login page
+      if (!authenticated && location !== '/login') {
+        setLocation('/login');
+      }
       // Redirect to home if authenticated user tries to access login page
-      if (authenticated && location === '/login') {
-        window.location.href = '/';
+      else if (authenticated && location === '/login') {
+        setLocation('/');
       }
     };
     
@@ -54,7 +59,7 @@ function Router() {
     // Check authentication status periodically
     const interval = setInterval(checkAuth, 1000);
     return () => clearInterval(interval);
-  }, [location]);
+  }, [location, setLocation]);
 
   return (
     <Switch>

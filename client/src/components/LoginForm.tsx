@@ -67,8 +67,12 @@ export function LoginForm() {
         title: "Success",
         description: "Logged in successfully",
       });
-      // Force a page reload to ensure authentication state is updated
-      window.location.href = "/";
+      // Use setLocation for navigation
+      setLocation("/");
+      // Reload the page after a small delay to ensure cookie is set
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
     },
     onError: (error) => {
       toast({

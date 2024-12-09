@@ -1,4 +1,4 @@
-import React, { StrictMode, useEffect } from "react";
+import React, { StrictMode, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Switch, Route, useLocation } from "wouter";
 import "./index.css";
@@ -11,35 +11,56 @@ import { LoginPage } from "./pages/LoginPage";
 
 function PrivateRoute({ component: Component }: { component: React.ComponentType }) {
   const [, setLocation] = useLocation();
-  const isAuthenticated = document.cookie.includes('authenticated=true');
+  const [isChecking, setIsChecking] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   
   useEffect(() => {
-    if (!isAuthenticated) {
-      setLocation('/login');
-    }
-  }, [isAuthenticated, setLocation]);
+    const checkAuth = () => {
+      const authenticated = document.cookie.includes('authenticated=true');
+      setIsAuthenticated(authenticated);
+      setIsChecking(false);
+      
+      if (!authenticated) {
+        setLocation('/login');
+      }
+    };
+    
+    checkAuth();
+  }, [setLocation]);
 
-  if (!isAuthenticated) {
-    return null;
+  if (isChecking) {
+    return null; // or a loading spinner
   }
 
-  return <Component />;
+  return isAuthenticated ? <Component /> : null;
 }
 
 function Router() {
   const [location] = useLocation();
-  const isAuthenticated = document.cookie.includes('authenticated=true');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Redirect to home if authenticated user tries to access login page
   useEffect(() => {
-    if (isAuthenticated && location === '/login') {
-      window.location.href = '/';
-    }
-  }, [isAuthenticated, location]);
+    const checkAuth = () => {
+      const authenticated = document.cookie.includes('authenticated=true');
+      setIsAuthenticated(authenticated);
+      
+      // Redirect to home if authenticated user tries to access login page
+      if (authenticated && location === '/login') {
+        window.location.href = '/';
+      }
+    };
+    
+    checkAuth();
+    // Check authentication status periodically
+    const interval = setInterval(checkAuth, 1000);
+    return () => clearInterval(interval);
+  }, [location]);
 
   return (
     <Switch>
-      <Route path="/login" component={LoginPage} />
+      <Route path="/login">
+        {isAuthenticated ? null : <LoginPage />}
+      </Route>
       <Route path="/projects">
         <PrivateRoute component={ProjectManagementPage} />
       </Route>

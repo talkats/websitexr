@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { Button } from "@/components/ui/button";
 
 export function ModelViewer() {
@@ -56,7 +56,7 @@ export function ModelViewer() {
     const loader = new GLTFLoader();
     loader.load(
       "/sample-model.glb", // We'll need to add this file
-      (gltf) => {
+      (gltf: { scene: THREE.Object3D }) => {
         const model = gltf.scene;
         scene.add(model);
         modelRef.current = model;
@@ -74,7 +74,7 @@ export function ModelViewer() {
         setLoading(false);
       },
       undefined,
-      (error) => {
+      (error: Error) => {
         console.error("Error loading model:", error);
       }
     );

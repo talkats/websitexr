@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Users, FolderKanban, Cube } from "lucide-react";
+import { Users, FolderKanban, Box } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -52,7 +52,7 @@ export function Sidebar() {
         </SidebarLink>
         <SidebarLink
           href="/model-viewer"
-          icon={<Cube className="h-4 w-4" />}
+          icon={<Box className="h-4 w-4" />}
           isActive={location === "/model-viewer"}
         >
           3D Model Viewer

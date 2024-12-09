@@ -42,11 +42,18 @@ export function registerRoutes(app: Express) {
         .where(eq(users.username, username));
       
       if (!user) {
+        console.log('User not found:', username);
         return res.status(401).json({ error: "Invalid credentials" });
       }
 
       // Compare password hash
       const isValidPassword = await bcrypt.compare(password, user.hashed_password);
+      console.log('Password validation:', { 
+        username,
+        isValidPassword,
+        hasHashedPassword: !!user.hashed_password
+      });
+      
       if (!isValidPassword) {
         return res.status(401).json({ error: "Invalid credentials" });
       }

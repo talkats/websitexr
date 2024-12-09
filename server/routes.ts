@@ -207,6 +207,12 @@ export function registerRoutes(app: Express) {
   // Create new project
   app.post("/api/projects", async (req, res) => {
     try {
+      console.log('Project creation request:', { 
+        body: req.body,
+        cookies: req.cookies,
+        headers: req.headers
+      });
+
       // Check authentication
       if (req.cookies?.['authenticated'] !== 'true') {
         console.log('Project creation: Authentication failed', { cookies: req.cookies });
@@ -221,22 +227,34 @@ export function registerRoutes(app: Express) {
         return res.status(400).json({ error: "Project name is required" });
       }
 
-      // Create project with optional thumbnail
-      const [newProject] = await db
+      console.log('Attempting database insert...');
+      const insertResult = await db
         .insert(projects)
         .values({ 
           name: name.trim(),
           thumbnail_url: thumbnail_url || null 
         })
         .returning();
+      
+      console.log('Database insert result:', insertResult);
+      
+      if (!insertResult || !insertResult[0]) {
+        throw new Error('No project returned from insert operation');
+      }
 
+      const newProject = insertResult[0];
       console.log('Project created successfully:', newProject);
       res.status(201).json(newProject);
     } catch (error) {
       console.error('Project creation error:', error);
       if (error instanceof Error) {
+        console.error('Error details:', {
+          message: error.message,
+          stack: error.stack
+        });
         res.status(500).json({ error: `Failed to create project: ${error.message}` });
       } else {
+        console.error('Unknown error type:', error);
         res.status(500).json({ error: "Failed to create project" });
       }
     }

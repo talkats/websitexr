@@ -64,9 +64,7 @@ function Router() {
       <Route path="/projects">
         <PrivateRoute component={ProjectManagementPage} />
       </Route>
-      <Route path="/">
-        <PrivateRoute component={HomePage} />
-      </Route>
+      <Route path="/" component={HomePage} />
       <Route>404 Page Not Found</Route>
     </Switch>
   );

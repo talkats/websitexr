@@ -71,7 +71,6 @@ export const insertProjectAssignmentSchema = createInsertSchema(projectAssignmen
 export const selectProjectAssignmentSchema = createSelectSchema(projectAssignments);
 
 // Types
-export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = z.infer<typeof selectUserSchema>;
 export type InsertProject = z.infer<typeof insertProjectSchema>;
 export type Project = z.infer<typeof selectProjectSchema>;

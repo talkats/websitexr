@@ -56,9 +56,6 @@ function Router() {
     };
     
     checkAuth();
-    // Check authentication status periodically
-    const interval = setInterval(checkAuth, 1000);
-    return () => clearInterval(interval);
   }, [location]);
 
   return (

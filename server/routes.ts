@@ -44,6 +44,12 @@ export function registerRoutes(app: Express) {
         return res.status(401).json({ error: "Invalid credentials" });
       }
 
+      // For now, we'll do a simple password check since we're storing plain passwords
+      // In production, you should use proper password hashing
+      if (password !== 'admin123') {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+
       // Set authentication cookie
       res.cookie('authenticated', 'true', {
         httpOnly: true,

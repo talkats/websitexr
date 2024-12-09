@@ -8,7 +8,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { HomePage } from "./pages/HomePage";
 import { ProjectManagementPage } from "./pages/ProjectManagementPage";
 import { LoginPage } from "./pages/LoginPage";
-import { Layout } from "./components/Layout";
 
 function PrivateRoute({ component: Component }: { component: React.ComponentType }) {
   const [, setLocation] = useLocation();
@@ -30,14 +29,14 @@ function PrivateRoute({ component: Component }: { component: React.ComponentType
   }, [setLocation]);
 
   if (isChecking) {
-    return null; // or a loading spinner
+    return null;
   }
 
   return isAuthenticated ? <Component /> : null;
 }
 
 function Router() {
-  const [location, setLocation] = useLocation();
+  const [location] = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
@@ -45,13 +44,9 @@ function Router() {
       const authenticated = document.cookie.includes('authenticated=true');
       setIsAuthenticated(authenticated);
       
-      // Redirect to login if not authenticated and not already on login page
-      if (!authenticated && location !== '/login') {
-        setLocation('/login');
-      }
       // Redirect to home if authenticated user tries to access login page
-      else if (authenticated && location === '/login') {
-        setLocation('/');
+      if (authenticated && location === '/login') {
+        window.location.href = '/';
       }
     };
     
@@ -59,7 +54,7 @@ function Router() {
     // Check authentication status periodically
     const interval = setInterval(checkAuth, 1000);
     return () => clearInterval(interval);
-  }, [location, setLocation]);
+  }, [location]);
 
   return (
     <Switch>
@@ -67,19 +62,9 @@ function Router() {
         {isAuthenticated ? null : <LoginPage />}
       </Route>
       <Route path="/projects">
-        <PrivateRoute component={() => (
-          <Layout>
-            <ProjectManagementPage />
-          </Layout>
-        )} />
+        <PrivateRoute component={ProjectManagementPage} />
       </Route>
-      <Route path="/">
-        <PrivateRoute component={() => (
-          <Layout>
-            <HomePage />
-          </Layout>
-        )} />
-      </Route>
+      <Route path="/" component={HomePage} />
       <Route>404 Page Not Found</Route>
     </Switch>
   );

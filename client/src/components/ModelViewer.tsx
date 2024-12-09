@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { Button } from "@/components/ui/button";
 
 export function ModelViewer() {
@@ -52,32 +51,16 @@ export function ModelViewer() {
     directionalLight.position.set(5, 5, 5);
     scene.add(directionalLight);
 
-    // Load model
-    const loader = new GLTFLoader();
-    loader.load(
-      "/sample-model.glb", // We'll need to add this file
-      (gltf: { scene: THREE.Object3D }) => {
-        const model = gltf.scene;
-        scene.add(model);
-        modelRef.current = model;
-        
-        // Center and scale the model
-        const box = new THREE.Box3().setFromObject(model);
-        const center = box.getCenter(new THREE.Vector3());
-        const size = box.getSize(new THREE.Vector3());
-        const maxDim = Math.max(size.x, size.y, size.z);
-        const scale = 2 / maxDim;
-        
-        model.position.sub(center);
-        model.scale.multiplyScalar(scale);
-        
-        setLoading(false);
-      },
-      undefined,
-      (error: Error) => {
-        console.error("Error loading model:", error);
-      }
-    );
+    // Create a simple cube
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshPhongMaterial({ 
+      color: 0x00ff00,
+      flatShading: true
+    });
+    const cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
+    modelRef.current = cube;
+    setLoading(false);
 
     // Animation loop
     function animate() {

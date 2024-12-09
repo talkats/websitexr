@@ -56,7 +56,11 @@ export const projectAssignmentsRelations = relations(projectAssignments, ({ one 
 }));
 
 // Schemas for validation and typing
-export const insertUserSchema = createInsertSchema(users);
+export const insertUserSchema = createInsertSchema(users, {
+  username: (schema) => schema.username.min(1, "Username is required"),
+  email: (schema) => schema.email.email("Must be a valid email"),
+  password: (schema) => schema.password.min(6, "Password must be at least 6 characters"),
+});
 export const selectUserSchema = createSelectSchema(users);
 export const insertProjectSchema = createInsertSchema(projects);
 export const selectProjectSchema = createSelectSchema(projects);

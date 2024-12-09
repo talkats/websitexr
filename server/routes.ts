@@ -83,7 +83,7 @@ export function registerRoutes(app: Express) {
   // Create new user
   app.post("/api/users", async (req, res) => {
     try {
-      const { username, password } = req.body;
+      const { username, password, email } = req.body;
       
       // Check if username already exists
       const existing = await db
@@ -95,16 +95,19 @@ export function registerRoutes(app: Express) {
         return res.status(400).json({ error: "Username already exists" });
       }
 
-      // Generate a default email based on username
-      const email = `${username}@example.com`;
-
       const [newUser] = await db
         .insert(users)
-        .values({ username, password, email })
+        .values({ 
+          username, 
+          password, 
+          email: email || `${username}@example.com`,
+          role: username === 'admin' ? 'admin' : 'user' // Set admin role for admin user
+        })
         .returning();
 
       res.status(201).json(newUser);
     } catch (error) {
+      console.error('Create user error:', error);
       res.status(500).json({ error: "Failed to create user" });
     }
   });

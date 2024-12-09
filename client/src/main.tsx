@@ -1,4 +1,4 @@
-import { StrictMode } from "react";
+import React, { StrictMode, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { Switch, Route, useLocation } from "wouter";
 import "./index.css";
@@ -11,13 +11,15 @@ import { LoginPage } from "./pages/LoginPage";
 
 function PrivateRoute({ component: Component }: { component: React.ComponentType }) {
   const [, setLocation] = useLocation();
-  
-  // Check if user is authenticated
   const isAuthenticated = document.cookie.includes('authenticated=true');
   
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setLocation('/login');
+    }
+  }, [isAuthenticated, setLocation]);
+
   if (!isAuthenticated) {
-    // Use setTimeout to avoid immediate redirect which can cause render issues
-    setTimeout(() => setLocation('/login'), 0);
     return null;
   }
 
@@ -25,14 +27,24 @@ function PrivateRoute({ component: Component }: { component: React.ComponentType
 }
 
 function Router() {
+  const [location] = useLocation();
+  const isAuthenticated = document.cookie.includes('authenticated=true');
+
+  // Redirect to home if authenticated user tries to access login page
+  useEffect(() => {
+    if (isAuthenticated && location === '/login') {
+      window.location.href = '/';
+    }
+  }, [isAuthenticated, location]);
+
   return (
     <Switch>
       <Route path="/login" component={LoginPage} />
-      <Route path="/">
-        <PrivateRoute component={HomePage} />
-      </Route>
       <Route path="/projects">
         <PrivateRoute component={ProjectManagementPage} />
+      </Route>
+      <Route path="/">
+        <PrivateRoute component={HomePage} />
       </Route>
       <Route>404 Page Not Found</Route>
     </Switch>

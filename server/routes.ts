@@ -95,9 +95,12 @@ export function registerRoutes(app: Express) {
         return res.status(400).json({ error: "Username already exists" });
       }
 
+      // Generate a default email based on username
+      const email = `${username}@example.com`;
+
       const [newUser] = await db
         .insert(users)
-        .values({ username, password })
+        .values({ username, password, email })
         .returning();
 
       res.status(201).json(newUser);

@@ -67,10 +67,8 @@ export function LoginForm() {
         title: "Success",
         description: "Logged in successfully",
       });
-      // Use setTimeout to ensure the cookie is set before redirecting
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 100);
+      // Force a page reload to ensure authentication state is updated
+      window.location.href = "/";
     },
     onError: (error) => {
       toast({

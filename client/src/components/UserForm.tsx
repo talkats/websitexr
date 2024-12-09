@@ -27,7 +27,8 @@ export function UserForm({ onSuccess }: UserFormProps) {
     resolver: zodResolver(insertUserSchema),
     defaultValues: {
       username: "",
-      password: ""
+      password: "",
+      email: ""
     }
   });
 
@@ -62,6 +63,22 @@ export function UserForm({ onSuccess }: UserFormProps) {
                 <FormLabel>Username</FormLabel>
                 <FormControl>
                   <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input type="email" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

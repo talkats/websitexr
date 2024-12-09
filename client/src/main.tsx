@@ -7,6 +7,7 @@ import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { HomePage } from "./pages/HomePage";
 import { ProjectManagementPage } from "./pages/ProjectManagementPage";
+import { ModelViewerPage } from "./pages/ModelViewerPage";
 import { LoginPage } from "./pages/LoginPage";
 import { Navigation } from "./components/Navigation";
 
@@ -91,6 +92,9 @@ function Router() {
       </Route>
       <Route path="/projects">
         <PrivateRoute component={ProjectManagementPage} />
+      </Route>
+      <Route path="/model-viewer">
+        <PrivateRoute component={ModelViewerPage} />
       </Route>
       <Route path="/">
         <PrivateRoute component={HomePage} />

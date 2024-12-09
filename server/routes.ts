@@ -14,9 +14,14 @@ declare module 'express-serve-static-core' {
 // Middleware to check if user is admin
 const isAdmin = async (req: Request) => {
   try {
-    // If there's an authenticated cookie, consider the user as admin for now
-    // In production, you would want to verify this against the database
-    return req.cookies['authenticated'] === 'true';
+    // For development, consider authenticated users as admin
+    // In production, you would want to verify the role against the database
+    const isAuthenticated = req.cookies?.['authenticated'] === 'true';
+    console.log('Admin check:', { 
+      cookies: req.cookies,
+      isAuthenticated 
+    });
+    return isAuthenticated;
   } catch (error) {
     console.error('Admin check error:', error);
     return false;
@@ -202,21 +207,38 @@ export function registerRoutes(app: Express) {
   // Create new project
   app.post("/api/projects", async (req, res) => {
     try {
-      const adminCheck = await isAdmin(req);
-      if (!adminCheck) {
+      // Check authentication
+      if (req.cookies?.['authenticated'] !== 'true') {
+        console.log('Project creation: Authentication failed', { cookies: req.cookies });
         return res.status(403).json({ error: "Only admins can create projects" });
       }
 
       const { name, thumbnail_url } = req.body;
+      console.log('Creating project:', { name, thumbnail_url });
+
+      // Validate name
+      if (!name || typeof name !== 'string' || name.trim() === '') {
+        return res.status(400).json({ error: "Project name is required" });
+      }
+
+      // Create project with optional thumbnail
       const [newProject] = await db
         .insert(projects)
-        .values({ name, thumbnail_url })
+        .values({ 
+          name: name.trim(),
+          thumbnail_url: thumbnail_url || null 
+        })
         .returning();
 
+      console.log('Project created successfully:', newProject);
       res.status(201).json(newProject);
     } catch (error) {
       console.error('Project creation error:', error);
-      res.status(500).json({ error: "Failed to create project" });
+      if (error instanceof Error) {
+        res.status(500).json({ error: `Failed to create project: ${error.message}` });
+      } else {
+        res.status(500).json({ error: "Failed to create project" });
+      }
     }
   });
 

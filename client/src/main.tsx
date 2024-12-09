@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { HomePage } from "./pages/HomePage";
 import { ProjectManagementPage } from "./pages/ProjectManagementPage";
 import { LoginPage } from "./pages/LoginPage";
+import { Navigation } from "./components/Navigation";
 
 function PrivateRoute({ component: Component }: { component: React.ComponentType }) {
   const [, setLocation] = useLocation();
@@ -32,7 +33,12 @@ function PrivateRoute({ component: Component }: { component: React.ComponentType
     return null;
   }
 
-  return isAuthenticated ? <Component /> : null;
+  return isAuthenticated ? (
+    <>
+      <Navigation />
+      <Component />
+    </>
+  ) : null;
 }
 
 function Router() {
@@ -71,7 +77,8 @@ function Router() {
   );
 }
 
-createRoot(document.getElementById("root")!).render(
+const root = createRoot(document.getElementById("root")!);
+root.render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <Router />

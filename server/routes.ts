@@ -35,9 +35,14 @@ export function registerRoutes(app: Express) {
     try {
       const { username, password } = req.body;
       
-      // Find user by username
+      // Find user by username and include hashed_password
       const [user] = await db
-        .select()
+        .select({
+          id: users.id,
+          username: users.username,
+          role: users.role,
+          hashed_password: users.hashed_password
+        })
         .from(users)
         .where(eq(users.username, username));
       
@@ -46,12 +51,19 @@ export function registerRoutes(app: Express) {
         return res.status(401).json({ error: "Invalid credentials" });
       }
 
+      // Log the retrieved user data (excluding password)
+      console.log('Found user:', {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        hasHashedPassword: !!user.hashed_password
+      });
+
       // Compare password hash
       const isValidPassword = await bcrypt.compare(password, user.hashed_password);
       console.log('Password validation:', { 
         username,
-        isValidPassword,
-        hasHashedPassword: !!user.hashed_password
+        isValidPassword
       });
       
       if (!isValidPassword) {

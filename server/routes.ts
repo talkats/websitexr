@@ -29,6 +29,41 @@ export function registerRoutes(app: Express) {
     res.json({ status: "healthy" });
   });
 
+  // Login endpoint
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      // Find user by username
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.username, username));
+      
+      if (!user) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+
+      // Set authentication cookie
+      res.cookie('authenticated', 'true', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      });
+
+      // Return user info (excluding sensitive data)
+      return res.json({
+        id: user.id,
+        username: user.username,
+        role: user.role
+      });
+    } catch (error) {
+      console.error('Login error:', error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // Get all users
   app.get("/api/users", async (_, res) => {
     try {

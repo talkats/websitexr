@@ -19,7 +19,7 @@ interface ProjectFormProps {
   project?: {
     id: number;
     name: string;
-    thumbnail_url?: string;
+    thumbnail_url?: string | null;
   };
   onSuccess?: () => void;
 }
@@ -33,13 +33,21 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
     resolver: zodResolver(insertProjectSchema),
     defaultValues: {
       name: project?.name ?? "",
-      thumbnail_url: project?.thumbnail_url ?? undefined,
+      thumbnail_url: project?.thumbnail_url || undefined,
     },
   });
 
   const mutation = useMutation({
     mutationFn: (data: InsertProject) =>
-      isEditing ? updateProject(project.id, data) : createProject(data),
+      isEditing 
+        ? updateProject(project.id, { 
+            name: data.name, 
+            thumbnail_url: data.thumbnail_url || undefined 
+          }) 
+        : createProject({ 
+            name: data.name, 
+            thumbnail_url: data.thumbnail_url || undefined 
+          }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       toast({
@@ -77,11 +85,16 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
         <FormField
           control={form.control}
           name="thumbnail_url"
-          render={({ field }) => (
+          render={({ field: { onChange, value, ...field } }) => (
             <FormItem>
               <FormLabel>Thumbnail URL</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input 
+                  {...field}
+                  value={value || ""}
+                  onChange={(e) => onChange(e.target.value || undefined)}
+                  placeholder="Optional: Enter image URL"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

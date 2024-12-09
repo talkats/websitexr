@@ -4,7 +4,7 @@ import { users, projects, projectAssignments, User, Project } from "@db/schema";
 import { eq, and } from "drizzle-orm";
 
 // Extend Express Request type to include user
-declare module 'express' {
+declare module 'express-serve-static-core' {
   interface Request {
     user?: User;
   }
@@ -89,21 +89,26 @@ export function registerRoutes(app: Express) {
   // Get all projects (with role-based filtering)
   app.get("/api/projects", async (req, res) => {
     try {
-      const query = isAdmin(req)
-        ? db.select().from(projects)
-        : db
-            .select({
-              id: projects.id,
-              name: projects.name,
-              created_at: projects.created_at,
-              thumbnail_url: projects.thumbnail_url,
-            })
-            .from(projects)
-            .innerJoin(
-              projectAssignments,
-              eq(projects.id, projectAssignments.project_id)
-            )
-            .where(eq(projectAssignments.user_id, req.user?.id));
+      let query;
+      if (isAdmin(req)) {
+        query = db.select().from(projects);
+      } else if (req.user?.id) {
+        query = db
+          .select({
+            id: projects.id,
+            name: projects.name,
+            created_at: projects.created_at,
+            thumbnail_url: projects.thumbnail_url,
+          })
+          .from(projects)
+          .innerJoin(
+            projectAssignments,
+            eq(projects.id, projectAssignments.project_id)
+          )
+          .where(eq(projectAssignments.user_id, req.user.id));
+      } else {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
 
       const allProjects = await query;
       res.json(allProjects);

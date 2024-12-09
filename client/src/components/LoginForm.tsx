@@ -67,7 +67,10 @@ export function LoginForm() {
         title: "Success",
         description: "Logged in successfully",
       });
-      setLocation("/");
+      // Use setTimeout to ensure the cookie is set before redirecting
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 100);
     },
     onError: (error) => {
       toast({

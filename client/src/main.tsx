@@ -16,7 +16,8 @@ function PrivateRoute({ component: Component }: { component: React.ComponentType
   const isAuthenticated = document.cookie.includes('authenticated=true');
   
   if (!isAuthenticated) {
-    setLocation('/login');
+    // Use setTimeout to avoid immediate redirect which can cause render issues
+    setTimeout(() => setLocation('/login'), 0);
     return null;
   }
 

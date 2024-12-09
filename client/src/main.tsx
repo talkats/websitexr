@@ -36,7 +36,7 @@ function PrivateRoute({ component: Component }: { component: React.ComponentType
 }
 
 function Router() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
@@ -44,9 +44,13 @@ function Router() {
       const authenticated = document.cookie.includes('authenticated=true');
       setIsAuthenticated(authenticated);
       
-      // Redirect to home if authenticated user tries to access login page
-      if (authenticated && location === '/login') {
-        window.location.href = '/';
+      // Redirect to login if not authenticated and not on login page
+      if (!authenticated && location !== '/login') {
+        setLocation('/login');
+      }
+      // Redirect to home if authenticated and on login page
+      else if (authenticated && location === '/login') {
+        setLocation('/');
       }
     };
     
@@ -54,7 +58,7 @@ function Router() {
     // Check authentication status periodically
     const interval = setInterval(checkAuth, 1000);
     return () => clearInterval(interval);
-  }, [location]);
+  }, [location, setLocation]);
 
   return (
     <Switch>
@@ -62,9 +66,19 @@ function Router() {
         {isAuthenticated ? null : <LoginPage />}
       </Route>
       <Route path="/projects">
-        <PrivateRoute component={ProjectManagementPage} />
+        <PrivateRoute component={() => (
+          <Layout>
+            <ProjectManagementPage />
+          </Layout>
+        )} />
       </Route>
-      <Route path="/" component={HomePage} />
+      <Route path="/">
+        <PrivateRoute component={() => (
+          <Layout>
+            <HomePage />
+          </Layout>
+        )} />
+      </Route>
       <Route>404 Page Not Found</Route>
     </Switch>
   );

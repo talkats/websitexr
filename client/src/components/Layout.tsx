@@ -1,4 +1,4 @@
-import { Navigation } from "./Navigation";
+import { Sidebar } from "./Sidebar";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -6,9 +6,9 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-      <main>{children}</main>
+    <div className="min-h-screen flex bg-background">
+      <Sidebar />
+      <main className="flex-1">{children}</main>
     </div>
   );
 }

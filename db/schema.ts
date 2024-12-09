@@ -11,7 +11,7 @@ export const users = pgTable("users", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   username: text("username").unique().notNull(),
   email: text("email").notNull(),
-  password: text("password").notNull(),
+  hashed_password: text("hashed_password").notNull(),
   role: userRoleEnum("role").default("user").notNull(),
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
@@ -56,17 +56,21 @@ export const projectAssignmentsRelations = relations(projectAssignments, ({ one 
 }));
 
 // Schemas for validation and typing
-export const insertUserSchema = createInsertSchema(users, {
-  username: (schema) => schema.username.min(1, "Username is required"),
-  email: (schema) => schema.email.email("Must be a valid email"),
-  password: (schema) => schema.password.min(6, "Password must be at least 6 characters"),
-});
+export const insertUserSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  email: z.string().email("Must be a valid email"),
+  password: z.string().min(6, "Password must be at least 6 characters")
+}).strict();
+
+export type InsertUser = z.infer<typeof insertUserSchema>;
+
 export const selectUserSchema = createSelectSchema(users);
 export const insertProjectSchema = createInsertSchema(projects);
 export const selectProjectSchema = createSelectSchema(projects);
 export const insertProjectAssignmentSchema = createInsertSchema(projectAssignments);
 export const selectProjectAssignmentSchema = createSelectSchema(projectAssignments);
 
+// Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = z.infer<typeof selectUserSchema>;
 export type InsertProject = z.infer<typeof insertProjectSchema>;

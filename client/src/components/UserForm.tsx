@@ -23,12 +23,12 @@ export function UserForm({ onSuccess }: UserFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  const form = useHookForm<InsertUser>({
+  const form = useHookForm({
     resolver: zodResolver(insertUserSchema),
     defaultValues: {
       username: "",
-      password: "",
-      email: ""
+      email: "",
+      password: ""
     }
   });
 

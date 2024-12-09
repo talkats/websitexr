@@ -2,6 +2,7 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { db } from "../db";
 import { users, projects, projectAssignments, User, Project } from "@db/schema";
 import { eq, and } from "drizzle-orm";
+import bcrypt from "bcrypt";
 
 // Extend Express Request type to include user
 declare module 'express-serve-static-core' {
@@ -44,9 +45,9 @@ export function registerRoutes(app: Express) {
         return res.status(401).json({ error: "Invalid credentials" });
       }
 
-      // For now, we'll do a simple password check since we're storing plain passwords
-      // In production, you should use proper password hashing
-      if (password !== 'admin123') {
+      // Compare password hash
+      const isValidPassword = await bcrypt.compare(password, user.hashed_password);
+      if (!isValidPassword) {
         return res.status(401).json({ error: "Invalid credentials" });
       }
 
@@ -95,17 +96,24 @@ export function registerRoutes(app: Express) {
         return res.status(400).json({ error: "Username already exists" });
       }
 
+      // Hash password
+      const saltRounds = 10;
+      const hashed_password = await bcrypt.hash(password, saltRounds);
+
+      // Insert new user with hashed password
       const [newUser] = await db
         .insert(users)
-        .values({ 
-          username, 
-          password, 
+        .values({
+          username,
           email: email || `${username}@example.com`,
-          role: username === 'admin' ? 'admin' : 'user' // Set admin role for admin user
+          hashed_password,
+          role: username === 'admin' ? 'admin' : 'user'
         })
         .returning();
 
-      res.status(201).json(newUser);
+      // Return user without hashed_password
+      const { hashed_password: _, ...userWithoutPassword } = newUser;
+      res.status(201).json(userWithoutPassword);
     } catch (error) {
       console.error('Create user error:', error);
       res.status(500).json({ error: "Failed to create user" });

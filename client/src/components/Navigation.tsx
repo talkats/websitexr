@@ -17,6 +17,11 @@ export function Navigation() {
                 Project Management
               </Button>
             </Link>
+            <Link href="/model-viewer">
+              <Button variant="link" className="text-lg font-semibold">
+                3D Model Viewer
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

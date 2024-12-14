@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { Button } from "@/components/ui/button";
+import { ModelViewerControls } from "./ModelViewerControls";
 
 export function ModelViewer() {
   const containerRef = useRef<HTMLDivElement>(null);

@@ -9,7 +9,7 @@ export function ModelViewer() {
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const controlsRef = useRef<OrbitControls | null>(null);
-  const modelRef = useRef<THREE.Object3D | null>(null);
+  const modelRef = useRef<THREE.Mesh | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Initialize Three.js scene
@@ -55,7 +55,9 @@ export function ModelViewer() {
     const geometry = new THREE.BoxGeometry(1, 1, 1);
     const material = new THREE.MeshPhongMaterial({ 
       color: 0x00ff00,
-      flatShading: true
+      flatShading: true,
+      transparent: true,
+      opacity: 1
     });
     const cube = new THREE.Mesh(geometry, material);
     scene.add(cube);
@@ -88,6 +90,39 @@ export function ModelViewer() {
     };
   }, []);
 
+  // Model control functions
+  const handleColorChange = (color: string) => {
+    if (modelRef.current) {
+      (modelRef.current.material as THREE.MeshPhongMaterial).color.setStyle(color);
+    }
+  };
+
+  const handleOpacityChange = (opacity: number) => {
+    if (modelRef.current) {
+      (modelRef.current.material as THREE.MeshPhongMaterial).opacity = opacity;
+    }
+  };
+
+  const handleObjectVisibilityToggle = (visible: boolean) => {
+    if (modelRef.current) {
+      modelRef.current.visible = visible;
+    }
+  };
+
+  const handleVRToggle = () => {
+    if (rendererRef.current?.xr) {
+      // VR mode implementation will go here
+      console.log("VR mode toggled");
+    }
+  };
+
+  const handleARToggle = (mode: "marker" | "markerless") => {
+    if (rendererRef.current?.xr) {
+      // AR mode implementation will go here
+      console.log("AR mode toggled:", mode);
+    }
+  };
+
   // Reset view function
   const resetView = () => {
     if (!cameraRef.current || !controlsRef.current || !modelRef.current) return;
@@ -105,15 +140,24 @@ export function ModelViewer() {
   };
 
   return (
-    <div className="w-full h-[600px] relative">
-      <div ref={containerRef} className="w-full h-full" />
-      {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-background/80">
-          <div className="text-lg font-semibold">Loading model...</div>
+    <div className="flex h-[600px] relative">
+      <ModelViewerControls
+        onColorChange={handleColorChange}
+        onOpacityChange={handleOpacityChange}
+        onObjectVisibilityToggle={handleObjectVisibilityToggle}
+        onVRToggle={handleVRToggle}
+        onARToggle={handleARToggle}
+      />
+      <div className="flex-1">
+        <div ref={containerRef} className="w-full h-full" />
+        {loading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-background/80">
+            <div className="text-lg font-semibold">Loading model...</div>
+          </div>
+        )}
+        <div className="absolute bottom-4 left-4">
+          <Button onClick={resetView}>Reset View</Button>
         </div>
-      )}
-      <div className="absolute bottom-4 left-4">
-        <Button onClick={resetView}>Reset View</Button>
       </div>
     </div>
   );

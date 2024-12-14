@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Trash2, Users } from "lucide-react";
+import { Trash2, Users, Box } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -191,6 +191,14 @@ export function ProjectList() {
                   </div>
                 </DialogContent>
               </Dialog>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hover:bg-primary/10 hover:text-primary"
+                onClick={() => window.location.href = '/model-viewer'}
+              >
+                <Box className="h-4 w-4" />
+              </Button>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button
